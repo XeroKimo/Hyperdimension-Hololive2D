@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
 public struct ActiveUnit
 {
     public BaseUnit unit;
@@ -24,6 +22,8 @@ public struct ActiveUnit
 public class BattleState : MonoBehaviour
 {
     public static BattleState instance;
+
+    public SpriteRenderer movementLimitObj;
 
     public PlayerController playerController;
     public AIController aiController;
@@ -48,6 +48,8 @@ public class BattleState : MonoBehaviour
         }
 
         instance = this;
+
+        movementLimitObj.transform.localScale = new Vector3(Constants.unitMaxUnitTravelDistance, Constants.unitMaxUnitTravelDistance, 1) * 2;
     }
 
     // Start is called before the first frame update
@@ -66,14 +68,9 @@ public class BattleState : MonoBehaviour
     public void StartNextTurn()
     {
         activeUnit.unit.OnUnitEndTurn();
-        BaseUnit unit = GetNextUnit();
-        activeUnit.unit.OnUnitTurnStart();
 
+        SetNextUnit();
 
-        ReduceUnitTimes(unit.time);
-        UnitDetector.instance.SetUnit(unit);
-
-        activeUnit.SetActiveUnit(unit);
     }
 
     public void InitializeBattle(UnitData[] playerUnits, UnitData[] enemyUnits)
@@ -98,13 +95,23 @@ public class BattleState : MonoBehaviour
             spawnedUnit.SetUnitRotation(180);
         }
 
+        SetNextUnit();
+    }
 
+    private void SetNextUnit()
+    {
         BaseUnit unit = GetNextUnit();
-        ReduceUnitTimes(unit.time);
-        activeUnit = new ActiveUnit(GetNextUnit());
+        activeUnit.SetActiveUnit(unit);
+        activeUnit.unit.OnUnitTurnStart();
 
+        ReduceUnitTimes(unit.time);
         UnitDetector.instance.SetUnit(unit);
-        unit.OnUnitTurnStart();
+        movementLimitObj.transform.position = activeUnit.unit.transform.position;
+
+        movementLimitObj.enabled = unit.isPlayerUnit;
+        UnitDetector.instance.visual.enabled = unit.isPlayerUnit;
+
+        activeUnit.SetActiveUnit(unit);
     }
 
     private void ReduceUnitTimes(float time)

@@ -41,3 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Effects
+    uniqueID: 1621371519
+    locked: 0
+  - name: Units
+    uniqueID: 1348213723
+    locked: 0

@@ -7,8 +7,8 @@ public class UnitDetector : MonoBehaviour
     public static UnitDetector instance;
 
     BaseUnit m_unit;
-
     BoxCollider2D m_collider;
+    public SpriteRenderer visual { get; private set; }
 
     public List<BaseUnit> allyCollisions = new List<BaseUnit>(3);
     public List<BaseUnit> enemyCollisions = new List<BaseUnit>(4);
@@ -25,6 +25,7 @@ public class UnitDetector : MonoBehaviour
         instance = this;
 
         m_collider = GetComponent<BoxCollider2D>();
+        visual = GetComponentInChildren<SpriteRenderer>();
     }
 
     // Start is called before the first frame update
@@ -55,6 +56,9 @@ public class UnitDetector : MonoBehaviour
 
         m_collider.size = size;
         m_collider.offset = offset + new Vector2(m_unit.unitCollider.size.x, 0);
+
+        visual.transform.localPosition = m_collider.offset;
+        visual.transform.localScale = m_collider.size;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -71,9 +75,8 @@ public class UnitDetector : MonoBehaviour
                 enemyCollisions.Add(unit);
             }
         }
-        Debug.Log(collision.name);
     }
-    private void OnTriggerExcit2D(Collider2D collision)
+    private void OnTriggerExit2D(Collider2D collision)
     {
         BaseUnit unit = collision.GetComponent<BaseUnit>();
         if(unit)
