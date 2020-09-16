@@ -98,7 +98,7 @@ public class BaseUnit : MonoBehaviour
     {
         m_unitData = data;
         GameObject unitDisplay = Instantiate(data.unitDisplayPrefab, transform);
-        m_sprite = unitDisplay.GetComponent<SpriteRenderer>();
+        m_sprite = unitDisplay.GetComponentInChildren<SpriteRenderer>();
         unitCollider = unitDisplay.GetComponent<BoxCollider2D>();
 
         Vector2 adjustedColliderSize = unitCollider.size;

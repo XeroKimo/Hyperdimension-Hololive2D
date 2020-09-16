@@ -156,7 +156,7 @@ MonoBehaviour:
   unitPrefab: {fileID: 3525150817093540647, guid: b83e5c9c74b4b1246a1f6f812ed12c8e,
     type: 3}
   debugPlayerData:
-  - unitDisplayPrefab: {fileID: 6530998569483156003, guid: eae3bd482f31f08448fa000d8263868f,
+  - unitDisplayPrefab: {fileID: 5041635377565695586, guid: b6658a82982674a4aba916a83abd27b3,
       type: 3}
     unitSize: {x: 0, y: 0}
     equipment:
