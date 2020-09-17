@@ -63,7 +63,7 @@ public class UnitDetector : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        BaseUnit unit = collision.GetComponent<BaseUnit>();
+        BaseUnit unit = collision.GetComponentInParent<BaseUnit>();
         if(unit)
         {
             if(unit.isPlayerUnit == m_unit.isPlayerUnit)
@@ -84,7 +84,7 @@ public class UnitDetector : MonoBehaviour
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
-        BaseUnit unit = collision.GetComponent<BaseUnit>();
+        BaseUnit unit = collision.GetComponentInParent<BaseUnit>();
         if(unit)
         {
             if(unit.isPlayerUnit == m_unit.isPlayerUnit)
