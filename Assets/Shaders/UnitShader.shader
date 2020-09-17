@@ -4,6 +4,7 @@
     {
         _MainTex ("Texture", 2D) = "white" {}
         _OutlineColor("Outline Color", Color) = (0, 0, 0, 0)
+        //_OutlineWidth("Outline Width", Range(0.0, 1.0)) = 0
         [PerRendererData] _OutlineWidth("Outline Width", Range(0.0, 1.0)) = 0
     }
     SubShader
@@ -75,14 +76,26 @@ struct appdata
             {
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv) * i.color;
-            //col.rgb *= col.a;
+            col.rgb *= col.a;
 
-            fixed4 colLeft = Outline(col, float2(i.uv.x + _OutlineWidth, i.uv.y));
+/*            fixed4 colLeft = Outline(col, float2(i.uv.x + _OutlineWidth, i.uv.y));
             fixed4 colRight = Outline(col, float2(i.uv.x - _OutlineWidth, i.uv.y));
             fixed4 colUp = Outline(col, float2(i.uv.x, i.uv.y + _OutlineWidth));
-            fixed4 colDown = Outline(col, float2(i.uv.x, i.uv.y - _OutlineWidth));
+            fixed4 colDown = Outline(col, float2(i.uv.x, i.uv.y - _OutlineWidth));    */        
+            
+            fixed4 colLeft = tex2D(_MainTex, float2(i.uv.x + _OutlineWidth, i.uv.y));
+            fixed4 colRight = tex2D(_MainTex, float2(i.uv.x - _OutlineWidth, i.uv.y));
+            fixed4 colUp = tex2D(_MainTex, float2(i.uv.x, i.uv.y + _OutlineWidth));
+            fixed4 colDown = tex2D(_MainTex, float2(i.uv.x, i.uv.y - _OutlineWidth));
 
-            return col + colLeft + colRight + colUp + colDown;
+            fixed4 merge = colLeft + colRight + colUp + colDown;
+            merge.a = clamp(merge.a, 0, 1);
+            merge.a -= col.a;
+            merge.a = clamp(merge.a, 0, 1);
+
+            merge.rgb = _OutlineColor * merge.a;
+
+            return col + merge;
             }
             ENDCG
         }

@@ -41,6 +41,11 @@ public class BattleState : MonoBehaviour
 
     public event System.Action OnTurnStart;
 
+    public UnitStatusBar debugPlayerStatusBar;
+    public UnitStatusBar debugEnemyStatusBar;
+
+    public GameObject debugGameOverTitle;
+
     private void Awake()
     {
         if(instance)
@@ -79,7 +84,8 @@ public class BattleState : MonoBehaviour
     {
         BaseUnit spawnedUnit;
 
-        for(int i = 0; i < playerUnits.Length; i++)
+        Debug.LogWarning("Initialize battle is in debug mode, set loop count to the amount of units in the array");
+        for(int i = 0; i < 1; i++)
         {
             spawnedUnit = Instantiate(unitPrefab, playerSpawnPoints[i].position, Quaternion.identity);
             units.Add(spawnedUnit);
@@ -87,15 +93,19 @@ public class BattleState : MonoBehaviour
 
             spawnedUnit.Initialize(playerUnits[i]);
             spawnedUnit.OnUnitDies += OnUnitDies;
+
+            debugPlayerStatusBar.TrackUnit(spawnedUnit);
         }
 
-        for(int i = 0; i < playerUnits.Length; i++)
+        for(int i = 0; i < 1; i++)
         {
             spawnedUnit = Instantiate(unitPrefab, enemySpawnPoints[i].position, Quaternion.identity);
             units.Add(spawnedUnit);
             spawnedUnit.Initialize(enemyUnits[i]);
             spawnedUnit.SetUnitRotation(180);
             spawnedUnit.OnUnitDies += OnUnitDies;
+
+            debugEnemyStatusBar.TrackUnit(spawnedUnit);
         }
 
         SetNextUnit();
@@ -133,7 +143,7 @@ public class BattleState : MonoBehaviour
         BaseUnit selectedUnit = null;
         foreach(BaseUnit unit in units)
         {
-            if(unit.time < lowestTime)
+            if(unit.time < lowestTime && unit.IsAlive())
             {
                 lowestTime = unit.time;
                 selectedUnit = unit;
@@ -144,16 +154,26 @@ public class BattleState : MonoBehaviour
 
     private void OnUnitDies(BaseUnit obj)
     {
-        units.Remove(obj);
-        obj.OnUnitDies -= OnUnitDies;
 
-        if(units.TrueForAll((BaseUnit unit) => unit.isPlayerUnit))
+        int enemyCount = 0;
+        int allyCount = 0;
+        foreach(BaseUnit unit in units)
+        {
+            if(!unit.isPlayerUnit && unit.IsAlive())
+                enemyCount++;
+            else if(unit.isPlayerUnit && unit.IsAlive())
+                allyCount++;
+        }
+
+        if(enemyCount == 0)
         {
             //Player wins
+            debugGameOverTitle.SetActive(true);
         }
-        else if(units.TrueForAll((BaseUnit unit) => !unit.isPlayerUnit))
+        else if(allyCount == 0)
         {
             //Enemy wins
+            debugGameOverTitle.SetActive(true);
         }
     }
 

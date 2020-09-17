@@ -14,12 +14,13 @@ public class TurnBar : MonoBehaviour
 
     public void Start()
     {
-        BattleState.instance.OnTurnStart += Instance_OnTurnStart;   
+        BattleState.instance.OnTurnStart += Instance_OnTurnStart;
+        Instance_OnTurnStart();
     }
 
     private void Instance_OnTurnStart()
     {
-        List<BaseUnit> units = new List<BaseUnit>(BattleState.instance.units);
+        List<BaseUnit> units = BattleState.instance.units.FindAll((BaseUnit compare) => compare.IsAlive());
 
         units.Sort((BaseUnit lh, BaseUnit rh) => { return lh.time.CompareTo(rh.time); });
 

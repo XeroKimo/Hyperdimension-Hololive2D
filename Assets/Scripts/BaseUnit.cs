@@ -82,6 +82,8 @@ public class BaseUnit : MonoBehaviour
 
 
     public event System.Action<BaseUnit> OnUnitDies;
+    public event System.Action<BaseUnit, int, int, int> OnDamageTaken;
+    public event System.Action<BaseUnit, int, int, int> OnManaConsumed;
 
     public float time = 0;
     public bool isPlayerUnit = false;
@@ -120,7 +122,7 @@ public class BaseUnit : MonoBehaviour
         m_rigidBody.bodyType = RigidbodyType2D.Dynamic;
 
         sprite.material.SetColor("_OutlineColor", m_originalColor);
-        sprite.material.SetFloat("_OutlineWidth", 0.01f);
+        sprite.material.SetFloat("_OutlineWidth", Constants.unitOutlineWidth);
     }
 
     public void OnUnitEndTurn()
@@ -139,16 +141,23 @@ public class BaseUnit : MonoBehaviour
     {
         m_unitData.stats.currentHP = Mathf.Clamp(m_unitData.stats.currentHP - amount, 0, m_unitData.totalStats.maxHP);
 
+        OnDamageTaken?.Invoke(this, m_unitData.stats.currentHP, m_unitData.totalStats.maxHP, amount);
         if(m_unitData.stats.currentHP == 0)
         {
             OnUnitDies?.Invoke(this);
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
+    }
+
+    public bool IsAlive()
+    {
+        return m_unitData.stats.currentHP > 0;
     }
 
     public void UseMana(int amount)
     {
         m_unitData.stats.currentMP = Mathf.Clamp(m_unitData.stats.currentMP - amount, 0, m_unitData.totalStats.maxMP);
+        OnDamageTaken?.Invoke(this, m_unitData.stats.currentMP, m_unitData.totalStats.maxMP, amount);
     }
 
     public bool HasEnoughMana(int amount)

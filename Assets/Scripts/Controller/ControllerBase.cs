@@ -22,6 +22,8 @@ public class ControllerBase : MonoBehaviour
 
             enemy.ApplyDamage(damage);
         }
+
+        BattleState.instance.activeUnit.unit.UseEnergy(Constants.attackEnergyCost);
         BattleState.instance.StartNextTurn();
     }
 

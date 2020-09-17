@@ -73,8 +73,12 @@ public class UnitDetector : MonoBehaviour
             else
             {
                 enemyCollisions.Add(unit);
-                unit.sprite.material.SetColor("_OutlineColor", Color.red);
-                unit.sprite.material.SetFloat("_OutlineWidth", 0.01f);
+
+                if(m_unit.isPlayerUnit)
+                {
+                    unit.sprite.material.SetColor("_OutlineColor", Color.red);
+                    unit.sprite.material.SetFloat("_OutlineWidth", Constants.unitOutlineWidth);
+                }
             }
         }
     }

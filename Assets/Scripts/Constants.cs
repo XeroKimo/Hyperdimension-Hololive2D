@@ -11,4 +11,6 @@ public static class Constants
 
     public const int attackEnergyCost = 100;
     public const int defendEnergyCost = 50;
+
+    public const float unitOutlineWidth = 0.03f;
 }

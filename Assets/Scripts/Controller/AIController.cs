@@ -10,6 +10,7 @@ public class AIController : ControllerBase
         if(BattleState.instance.activeUnit.unit.isPlayerUnit)
             return;
 
-        Defend();
+        if(!IsInvoking("Defend"))
+            Invoke("Defend", 1);
     }
 }
