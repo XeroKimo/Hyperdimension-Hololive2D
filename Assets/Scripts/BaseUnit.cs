@@ -79,8 +79,7 @@ public class BaseUnit : MonoBehaviour
     bool m_isDefending = false;
 
     Rigidbody2D m_rigidBody;
-    [SerializeField]
-    SpriteRenderer m_sprite;
+
 
     public event System.Action<BaseUnit> OnUnitDies;
 
@@ -88,6 +87,9 @@ public class BaseUnit : MonoBehaviour
     public bool isPlayerUnit = false;
     public float rotation { get; private set; }
     public BoxCollider2D unitCollider { get; private set; }
+    public SpriteRenderer sprite { get; private set; }
+
+    Color m_originalColor;
 
     private void Awake()
     {
@@ -98,7 +100,7 @@ public class BaseUnit : MonoBehaviour
     {
         m_unitData = data;
         GameObject unitDisplay = Instantiate(data.unitDisplayPrefab, transform);
-        m_sprite = unitDisplay.GetComponentInChildren<SpriteRenderer>();
+        sprite = unitDisplay.GetComponentInChildren<SpriteRenderer>();
         unitCollider = unitDisplay.GetComponent<BoxCollider2D>();
 
         Vector2 adjustedColliderSize = unitCollider.size;
@@ -108,27 +110,29 @@ public class BaseUnit : MonoBehaviour
             adjustedColliderSize.x = Constants.minUnitWidth;
         }
         unitCollider.size = adjustedColliderSize;
-
+        m_originalColor = sprite.material.GetColor("_OutlineColor");
         UseEnergy(startingEnergyCost);
     }
 
     public void OnUnitTurnStart()
     {
         m_isDefending = false;
-
-
         m_rigidBody.bodyType = RigidbodyType2D.Dynamic;
+
+        sprite.material.SetColor("_OutlineColor", m_originalColor);
+        sprite.material.SetFloat("_OutlineWidth", 0.01f);
     }
 
     public void OnUnitEndTurn()
     {
         m_rigidBody.bodyType = RigidbodyType2D.Static;
+        sprite.material.SetFloat("_OutlineWidth", 0);
     }
 
     public void Defend()
     {
         m_isDefending = true;
-        UseEnergy(50);
+        UseEnergy(Constants.defendEnergyCost);
     }
 
     public void ApplyDamage(int amount)
@@ -175,12 +179,12 @@ public class BaseUnit : MonoBehaviour
             (angle < -90 && angle > -180) ||
             (angle > 90 && angle < 180))
         {
-            m_sprite.flipX = true;
+            sprite.flipX = true;
         }
         else if((angle < 90 && angle > -90) ||
             angle > 270)
         {
-            m_sprite.flipX = false;
+            sprite.flipX = false;
         }
     }
 

@@ -73,6 +73,8 @@ public class UnitDetector : MonoBehaviour
             else
             {
                 enemyCollisions.Add(unit);
+                unit.sprite.material.SetColor("_OutlineColor", Color.red);
+                unit.sprite.material.SetFloat("_OutlineWidth", 0.01f);
             }
         }
     }
@@ -88,6 +90,7 @@ public class UnitDetector : MonoBehaviour
             else
             {
                 enemyCollisions.Remove(unit);
+                unit.sprite.material.SetFloat("_OutlineWidth", 0.00f);
             }
         }
     }

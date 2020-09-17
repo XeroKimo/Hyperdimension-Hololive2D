@@ -7,7 +7,7 @@ public class ControllerBase : MonoBehaviour
 
     protected void Attack()
     {
-        List<BaseUnit> enemies = UnitDetector.instance.enemyCollisions;
+        List<BaseUnit> enemies = new List<BaseUnit>(UnitDetector.instance.enemyCollisions);
         if(enemies.Count == 0)
             return;
 

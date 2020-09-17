@@ -8,4 +8,7 @@ public static class Constants
     public const float unitTravelSpeed = 144;
 
     public const float minUnitWidth = 32;
+
+    public const int attackEnergyCost = 100;
+    public const int defendEnergyCost = 50;
 }

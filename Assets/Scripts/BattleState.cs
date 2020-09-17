@@ -37,7 +37,9 @@ public class BattleState : MonoBehaviour
 
     public ActiveUnit activeUnit;
 
-    List<BaseUnit> m_units = new List<BaseUnit>();
+    public List<BaseUnit> units { get; private set; }
+
+    public event System.Action OnTurnStart;
 
     private void Awake()
     {
@@ -48,6 +50,8 @@ public class BattleState : MonoBehaviour
         }
 
         instance = this;
+
+        units = new List<BaseUnit>();
 
         movementLimitObj.transform.localScale = new Vector3(Constants.unitMaxUnitTravelDistance, Constants.unitMaxUnitTravelDistance, 1) * 2;
     }
@@ -68,9 +72,7 @@ public class BattleState : MonoBehaviour
     public void StartNextTurn()
     {
         activeUnit.unit.OnUnitEndTurn();
-
         SetNextUnit();
-
     }
 
     public void InitializeBattle(UnitData[] playerUnits, UnitData[] enemyUnits)
@@ -80,7 +82,7 @@ public class BattleState : MonoBehaviour
         for(int i = 0; i < playerUnits.Length; i++)
         {
             spawnedUnit = Instantiate(unitPrefab, playerSpawnPoints[i].position, Quaternion.identity);
-            m_units.Add(spawnedUnit);
+            units.Add(spawnedUnit);
             spawnedUnit.isPlayerUnit = true;
 
             spawnedUnit.Initialize(playerUnits[i]);
@@ -90,9 +92,10 @@ public class BattleState : MonoBehaviour
         for(int i = 0; i < playerUnits.Length; i++)
         {
             spawnedUnit = Instantiate(unitPrefab, enemySpawnPoints[i].position, Quaternion.identity);
-            m_units.Add(spawnedUnit);
+            units.Add(spawnedUnit);
             spawnedUnit.Initialize(enemyUnits[i]);
             spawnedUnit.SetUnitRotation(180);
+            spawnedUnit.OnUnitDies += OnUnitDies;
         }
 
         SetNextUnit();
@@ -111,12 +114,14 @@ public class BattleState : MonoBehaviour
         movementLimitObj.enabled = unit.isPlayerUnit;
         UnitDetector.instance.visual.enabled = unit.isPlayerUnit;
 
+        OnTurnStart?.Invoke();
+
         activeUnit.SetActiveUnit(unit);
     }
 
     private void ReduceUnitTimes(float time)
     {
-        foreach(BaseUnit unit in m_units)
+        foreach(BaseUnit unit in units)
         {
             unit.time = Mathf.Max(0, unit.time - time);
         }
@@ -126,7 +131,7 @@ public class BattleState : MonoBehaviour
     {
         float lowestTime = float.MaxValue;
         BaseUnit selectedUnit = null;
-        foreach(BaseUnit unit in m_units)
+        foreach(BaseUnit unit in units)
         {
             if(unit.time < lowestTime)
             {
@@ -139,14 +144,14 @@ public class BattleState : MonoBehaviour
 
     private void OnUnitDies(BaseUnit obj)
     {
-        m_units.Remove(obj);
+        units.Remove(obj);
         obj.OnUnitDies -= OnUnitDies;
 
-        if(m_units.TrueForAll((BaseUnit unit) => unit.isPlayerUnit))
+        if(units.TrueForAll((BaseUnit unit) => unit.isPlayerUnit))
         {
             //Player wins
         }
-        else if(m_units.TrueForAll((BaseUnit unit) => !unit.isPlayerUnit))
+        else if(units.TrueForAll((BaseUnit unit) => !unit.isPlayerUnit))
         {
             //Enemy wins
         }
