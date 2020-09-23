@@ -4,6 +4,8 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
+//Version 0.2
+
 public class UnitStatusBar : MonoBehaviour
 {
     [SerializeField]
@@ -13,34 +15,35 @@ public class UnitStatusBar : MonoBehaviour
     [SerializeField]
     Slider m_mpBar;
 
-    BaseUnit m_unit;
+    BattleUnit m_unit;
 
-    public void TrackUnit(BaseUnit unit)
+    public void TrackUnit(BattleUnit unit)
     {
         m_unit = unit;
 
-        UnitStats totalStats = unit.GetUnitData().totalStats;
-        m_unitName.text = unit.GetUnitData().unitDisplayPrefab.name;
-        m_hpBar.value = totalStats.currentHP / totalStats.maxHP;
-        m_mpBar.value = totalStats.currentMP / totalStats.maxMP;
+        UnitStats totalStats = unit.unitData.totalStats;
+        m_unitName.text = unit.unitData.unitDisplayPrefab.name;
+        m_hpBar.value = (float)totalStats.currentHP / (float)totalStats.maxHP;
+        m_mpBar.value = (float)totalStats.currentMP / (float)totalStats.maxMP;
 
         m_unit.OnUnitDies += OnUnitDies;
         m_unit.OnDamageTaken += OnDamageTaken;
         m_unit.OnManaConsumed += OnManaConsumed;
     }
 
-    private void OnDamageTaken(BaseUnit unit, int currentHP, int maxHP, int damage)
+    private void OnDamageTaken(BattleUnit unit, int damageTaken)
     {
-        Debug.Log(currentHP + " " + maxHP);
-        m_hpBar.value = (float)(currentHP) / (float)(maxHP);
+        UnitStats totalStats = unit.unitData.totalStats;
+        m_hpBar.value = (float)totalStats.currentHP / (float)totalStats.maxHP;
     }
 
-    private void OnManaConsumed(BaseUnit unit, int currentMana, int maxMana, int manaConsumed)
+    private void OnManaConsumed(BattleUnit unit, int manaConsumed)
     {
-        m_mpBar.value = (float)(currentMana) / (float)(maxMana);
+        UnitStats totalStats = unit.unitData.totalStats;
+        m_mpBar.value = (float)totalStats.currentMP / (float)totalStats.maxMP;
     }
 
-    private void OnUnitDies(BaseUnit obj)
+    private void OnUnitDies(BattleUnit obj)
     {
 
     }

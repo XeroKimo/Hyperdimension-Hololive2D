@@ -1,45 +1,23 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public struct ActiveUnit
-{
-    public BaseUnit unit;
-    public Vector2 initialPos;
-
-    public ActiveUnit(BaseUnit unit)
-    {
-        this.unit = unit;
-        initialPos = unit.transform.position;
-    }
-
-    public void SetActiveUnit(BaseUnit unit)
-    {
-        this.unit = unit;
-        initialPos = unit.transform.position;
-    }
-}
+//Version: 0.2
 
 public class BattleState : MonoBehaviour
 {
     public static BattleState instance;
+    public event System.Action OnTurnStart;
 
     public SpriteRenderer movementLimitObj;
 
-    public PlayerController playerController;
-    public AIController aiController;
-
-    public BaseUnit unitPrefab;
-    public UnitData[] debugPlayerData;
-    public UnitData[] debugEnemyData;
 
     public Transform[] playerSpawnPoints;
     public Transform[] enemySpawnPoints;
 
-    public ActiveUnit activeUnit;
-
-    public List<BaseUnit> units { get; private set; }
-
-    public event System.Action OnTurnStart;
+    [SerializeField]
+    private BattleUnit m_unitPrefab;
+    public BattleUnit activeUnit { get; private set; }
+    public List<BattleUnit> units { get; private set; }
 
     public UnitStatusBar debugPlayerStatusBar;
     public UnitStatusBar debugEnemyStatusBar;
@@ -56,16 +34,14 @@ public class BattleState : MonoBehaviour
 
         instance = this;
 
-        units = new List<BaseUnit>();
+        units = new List<BattleUnit>();
 
-        movementLimitObj.transform.localScale = new Vector3(Constants.unitMaxUnitTravelDistance, Constants.unitMaxUnitTravelDistance, 1) * 2;
+        movementLimitObj.transform.localScale = new Vector3(BattleConstants.unitMaxUnitTravelDistance, BattleConstants.unitMaxUnitTravelDistance, 1) * 2;
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        //For debugging
-        InitializeBattle(debugPlayerData, debugEnemyData);
     }
 
     // Update is called once per frame
@@ -76,22 +52,21 @@ public class BattleState : MonoBehaviour
 
     public void StartNextTurn()
     {
-        activeUnit.unit.OnUnitEndTurn();
+        activeUnit.OnUnitEndTurn();
         SetNextUnit();
     }
 
     public void InitializeBattle(UnitData[] playerUnits, UnitData[] enemyUnits)
     {
-        BaseUnit spawnedUnit;
+        BattleUnit spawnedUnit;
 
         Debug.LogWarning("Initialize battle is in debug mode, set loop count to the amount of units in the array");
         for(int i = 0; i < 1; i++)
         {
-            spawnedUnit = Instantiate(unitPrefab, playerSpawnPoints[i].position, Quaternion.identity);
+            spawnedUnit = Instantiate(m_unitPrefab, playerSpawnPoints[i].position, Quaternion.identity);
             units.Add(spawnedUnit);
-            spawnedUnit.isPlayerUnit = true;
 
-            spawnedUnit.Initialize(playerUnits[i]);
+            spawnedUnit.Initialize(playerUnits[i], true);
             spawnedUnit.OnUnitDies += OnUnitDies;
 
             debugPlayerStatusBar.TrackUnit(spawnedUnit);
@@ -99,49 +74,44 @@ public class BattleState : MonoBehaviour
 
         for(int i = 0; i < 1; i++)
         {
-            spawnedUnit = Instantiate(unitPrefab, enemySpawnPoints[i].position, Quaternion.identity);
+            spawnedUnit = Instantiate(m_unitPrefab, enemySpawnPoints[i].position, Quaternion.identity);
             units.Add(spawnedUnit);
-            spawnedUnit.Initialize(enemyUnits[i]);
-            spawnedUnit.SetUnitRotation(180);
+            spawnedUnit.Initialize(enemyUnits[i], false);
             spawnedUnit.OnUnitDies += OnUnitDies;
 
             debugEnemyStatusBar.TrackUnit(spawnedUnit);
         }
-
         SetNextUnit();
     }
 
     private void SetNextUnit()
     {
-        BaseUnit unit = GetNextUnit();
-        activeUnit.SetActiveUnit(unit);
-        activeUnit.unit.OnUnitTurnStart();
-
+        BattleUnit unit = GetNextUnit();
+        unit.OnUnitStartTurn();
         ReduceUnitTimes(unit.time);
-        UnitDetector.instance.SetUnit(unit);
-        movementLimitObj.transform.position = activeUnit.unit.transform.position;
 
         movementLimitObj.enabled = unit.isPlayerUnit;
-        UnitDetector.instance.visual.enabled = unit.isPlayerUnit;
-
+        movementLimitObj.transform.position = unit.transform.position -
+            (unit.sprite.transform.localPosition / 2);   //Offset by half the sprite's local position so visually
+                                                                    //the sprite will hit the edge of the circle limit
         OnTurnStart?.Invoke();
 
-        activeUnit.SetActiveUnit(unit);
+        activeUnit = unit;
     }
 
     private void ReduceUnitTimes(float time)
     {
-        foreach(BaseUnit unit in units)
+        foreach(BattleUnit unit in units)
         {
             unit.time = Mathf.Max(0, unit.time - time);
         }
     }
 
-    private BaseUnit GetNextUnit()
+    private BattleUnit GetNextUnit()
     {
         float lowestTime = float.MaxValue;
-        BaseUnit selectedUnit = null;
-        foreach(BaseUnit unit in units)
+        BattleUnit selectedUnit = null;
+        foreach(BattleUnit unit in units)
         {
             if(unit.time < lowestTime && unit.IsAlive())
             {
@@ -152,12 +122,12 @@ public class BattleState : MonoBehaviour
         return selectedUnit;
     }
 
-    private void OnUnitDies(BaseUnit obj)
+    private void OnUnitDies(BattleUnit obj)
     {
 
         int enemyCount = 0;
         int allyCount = 0;
-        foreach(BaseUnit unit in units)
+        foreach(BattleUnit unit in units)
         {
             if(!unit.isPlayerUnit && unit.IsAlive())
                 enemyCount++;
@@ -176,5 +146,4 @@ public class BattleState : MonoBehaviour
             debugGameOverTitle.SetActive(true);
         }
     }
-
 }

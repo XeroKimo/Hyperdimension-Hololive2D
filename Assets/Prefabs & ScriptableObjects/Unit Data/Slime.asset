@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 887096605edbedc47a654d51573f5438, type: 3}
+  m_Name: Slime
+  m_EditorClassIdentifier: 
+  unitData:
+    unitDisplayPrefab: {fileID: 6530998569483156003, guid: eae3bd482f31f08448fa000d8263868f,
+      type: 3}
+    equipment:
+      headGear: {fileID: 11400000, guid: 9f5b60ab3f2a3204d8a6a6e518b353a7, type: 2}
+      weapon: {fileID: 11400000, guid: 015b1502cff98234ea0200586f6a1b34, type: 2}
+      bodyGear: {fileID: 11400000, guid: 76cef80e02bb3324fafe5ab0de1559fa, type: 2}
+      legGear: {fileID: 11400000, guid: c2a4620eb21b0a1468b9761d0bdef552, type: 2}
+    stats:
+      currentHP: 10
+      maxHP: 10
+      currentMP: 10
+      maxMP: 10
+      attack: 1
+      defense: 1
+      hit: 1
+      dodge: 1
+      speed: 1

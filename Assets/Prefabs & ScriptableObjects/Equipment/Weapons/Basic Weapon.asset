@@ -20,5 +20,4 @@ MonoBehaviour:
     hitModifier: 0
     dodgeModifier: 0
     speedModifier: 0
-  hitboxSize: {x: 32, y: 32}
-  hitboxOffset: {x: 0, y: 0}
+  hitbox: {fileID: 7815364206242070094, guid: 8b49a595a1c46b6479bc32fa9f767e62, type: 3}

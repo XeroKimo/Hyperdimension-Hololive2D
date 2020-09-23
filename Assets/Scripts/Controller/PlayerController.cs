@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Version: 0.2
+
 public class PlayerController : ControllerBase
 {
 
@@ -15,22 +17,22 @@ public class PlayerController : ControllerBase
 
     private void Update()
     {
-        if(!BattleState.instance.activeUnit.unit.isPlayerUnit)
+        if(!BattleState.instance.activeUnit.isPlayerUnit)
             return;
 
         if(Input.GetButtonDown("Submit"))
         {
-            Attack();
+            BattleState.instance.activeUnit.Attack();
         }
         if(Input.GetButtonDown("Cancel"))
         {
-            Defend();
+            BattleState.instance.activeUnit.Defend();
         }
     }
 
     private void FixedUpdate()
     {
-        if(!BattleState.instance.activeUnit.unit.isPlayerUnit)
+        if(!BattleState.instance.activeUnit.isPlayerUnit)
             return;
 
 
@@ -39,7 +41,7 @@ public class PlayerController : ControllerBase
         {
             if(inputDirection.sqrMagnitude > 1)
                 inputDirection.Normalize();
-            MoveUnit(inputDirection);
+            BattleState.instance.activeUnit.MoveUnit(inputDirection);
         }
     }
 }

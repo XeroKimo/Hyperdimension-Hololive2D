@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+//Version 0.2
 [System.Serializable]
 public struct EquipmentStats
 {

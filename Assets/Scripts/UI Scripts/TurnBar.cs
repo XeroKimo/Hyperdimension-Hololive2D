@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+//Version 0.2
+
 public class TurnBar : MonoBehaviour
 {
     private RawImage[] m_images;
@@ -15,16 +17,16 @@ public class TurnBar : MonoBehaviour
     public void Start()
     {
         BattleState.instance.OnTurnStart += Instance_OnTurnStart;
-        Instance_OnTurnStart();
+        //Instance_OnTurnStart();
     }
 
     private void Instance_OnTurnStart()
     {
-        List<BaseUnit> units = BattleState.instance.units.FindAll((BaseUnit compare) => compare.IsAlive());
+        List<BattleUnit> units = BattleState.instance.units.FindAll((BattleUnit compare) => compare.IsAlive());
 
-        units.Sort((BaseUnit lh, BaseUnit rh) => { return lh.time.CompareTo(rh.time); });
+        units.Sort((BattleUnit lh, BattleUnit rh) => { return lh.time.CompareTo(rh.time); });
 
-        HashSet<BaseUnit> usedUnits = new HashSet<BaseUnit>();
+        HashSet<BattleUnit> usedUnits = new HashSet<BattleUnit>();
 
         for(int i = 0; i < units.Count; i++)
         {
