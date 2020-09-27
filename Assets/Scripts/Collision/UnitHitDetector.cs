@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//Version: 0.22
+//Version: 0.23
 
 public class UnitHitDetector : MonoBehaviour
 {
@@ -39,31 +39,10 @@ public class UnitHitDetector : MonoBehaviour
         m_activeCollider = new System.Tuple<Collider2D, SpriteRenderer>(m_boxCollider.Item1, m_boxCollider.Item2);
     }
 
-
-    private void TriggerEnter2D(Collider2D collision)
-    {
-        BattleUnit unit = collision.GetComponentInParent<BattleUnit>();
-        if(unit)
-        {
-            TrackUnit(unit);
-        }
-    }
-
-    private void TriggerExit2D(Collider2D collision)
-    {
-        BattleUnit unit = collision.GetComponentInParent<BattleUnit>();
-        if(unit)
-            UntrackUnit(unit);
-    }
-
     public void SetUnit(BattleUnit unit)
     {
-        ClearCollisions();
-
         m_unit = unit;
         m_activeCollider.Item2.enabled = unit.isPlayerUnit;
-
-        CheckCollisions();
     }
 
 
@@ -98,7 +77,7 @@ public class UnitHitDetector : MonoBehaviour
         m_activeCollider.Item1.offset = offset;
         m_activeCollider.Item2.transform.localPosition = new Vector3(offset.x, offset.y);
 
-        RefreshCollisions();
+        //RefreshCollisions();
     }
 
     public void RefreshCollisions()
@@ -107,7 +86,7 @@ public class UnitHitDetector : MonoBehaviour
         CheckCollisions();
     }
 
-    void ClearCollisions()
+    public void ClearCollisions()
     {
         List<BattleUnit> activeCollisions = new List<BattleUnit>(7);
         activeCollisions.AddRange(allyCollisions);
@@ -117,9 +96,13 @@ public class UnitHitDetector : MonoBehaviour
         {
             UntrackUnit(unit);
         }
+        if(enemyCollisions.Count > 0)
+        {
+            Debug.Log(enemyCollisions.Count);
+        }
     }
 
-    void CheckCollisions()
+    public void CheckCollisions()
     {
         List<Collider2D> collisions = new List<Collider2D>();
         m_activeCollider.Item1.OverlapCollider(new ContactFilter2D().NoFilter(), collisions);
@@ -170,5 +153,21 @@ public class UnitHitDetector : MonoBehaviour
 
         m_circleCollider.Item1.GetComponent<CollisionCallbacks2D>().TriggerEnter2D -= TriggerEnter2D;
         m_circleCollider.Item1.GetComponent<CollisionCallbacks2D>().TriggerExit2D -= TriggerExit2D;
+    }
+
+    private void TriggerEnter2D(Collider2D collision)
+    {
+        BattleUnit unit = collision.GetComponentInParent<BattleUnit>();
+        if(unit)
+        {
+            TrackUnit(unit);
+        }
+    }
+
+    private void TriggerExit2D(Collider2D collision)
+    {
+        BattleUnit unit = collision.GetComponentInParent<BattleUnit>();
+        if(unit)
+            UntrackUnit(unit);
     }
 }

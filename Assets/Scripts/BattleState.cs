@@ -10,6 +10,8 @@ public class BattleState : MonoBehaviour
 
     public SpriteRenderer movementLimitObj;
 
+    public PlayerController playerController;
+    public AIController AIcontroller;
 
     public Transform[] playerSpawnPoints;
     public Transform[] enemySpawnPoints;

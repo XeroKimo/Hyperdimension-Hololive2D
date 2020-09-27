@@ -6,10 +6,11 @@ using UnityEngine;
 
 public class PlayerController : ControllerBase
 {
-
+    public bool isActive = true;
     // Start is called before the first frame update
     void Start()
     {
+        isActive = true;
         //Debug.LogWarning("Controller Base Debug mode enabled");
 
         //unit.OnUnitTurnStart();
@@ -17,7 +18,7 @@ public class PlayerController : ControllerBase
 
     private void Update()
     {
-        if(!BattleState.instance.activeUnit.isPlayerUnit)
+        if(!BattleState.instance.activeUnit.isPlayerUnit || !isActive)
             return;
 
         if(Input.GetButtonDown("Submit"))
@@ -28,11 +29,16 @@ public class PlayerController : ControllerBase
         {
             BattleState.instance.activeUnit.Defend();
         }
+        if(Input.GetButtonDown("Skills"))
+        {
+            SkillMenu.instance.gameObject.SetActive(true);
+            isActive = false;
+        }
     }
 
     private void FixedUpdate()
     {
-        if(!BattleState.instance.activeUnit.isPlayerUnit)
+        if(!BattleState.instance.activeUnit.isPlayerUnit || !isActive)
             return;
 
 

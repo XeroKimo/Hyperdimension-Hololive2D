@@ -45,6 +45,8 @@ public struct UnitData
     public UnitEquipment equipment;
     public UnitStats stats;
 
+    public List<SkillData> skills;
+
     public UnitStats totalStats
     {
         get
@@ -67,144 +69,52 @@ public struct UnitData
     }
 }
 
-//Version: 0.21
+public enum TargetTag
+{
+    Enemy,
+    Ally
+}
+
+public enum HitboxStyle
+{
+    Attached
+}
+
+[System.Serializable]
+public struct AttackDescription
+{
+    public int manaCost;
+    public int energyCost;
+    public int attackModifier;
+    public TargetTag targetTag;
+
+    public AttackDescription(int manaCost, int energyCost, int attackModifier, TargetTag targetTag)
+    {
+        this.manaCost = manaCost;
+        this.energyCost = energyCost;
+        this.attackModifier = attackModifier;
+        this.targetTag = targetTag;
+    }
+}
+
+[System.Serializable]
+public struct HitboxDescription
+{
+    public HitboxStyle style;
+    public UnitHitDetectorConfig hitboxConfig;
+
+    public HitboxDescription(HitboxStyle style, UnitHitDetectorConfig hitboxConfig)
+    {
+        this.style = style;
+        this.hitboxConfig = hitboxConfig;
+    }
+}
+
+//Version: 0.23
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class BattleUnit : MonoBehaviour
 {
-    //const int startingEnergyCost = 100;
-
-    //[SerializeField]
-    //UnitData m_unitData;
-    //bool m_isDefending = false;
-
-    //Rigidbody2D m_rigidBody;
-
-
-    //public event System.Action<BattleUnit> OnUnitDies;
-    //public event System.Action<BattleUnit, int, int, int> OnDamageTaken;
-    //public event System.Action<BattleUnit, int, int, int> OnManaConsumed;
-
-    //public float time = 0;
-    //public bool isPlayerUnit = false;
-    //public float rotation { get; private set; }
-    //public BoxCollider2D unitCollider { get; private set; }
-    //public SpriteRenderer sprite { get; private set; }
-
-    //Color m_originalColor;
-
-    //private void Awake()
-    //{
-    //    m_rigidBody = GetComponent<Rigidbody2D>();
-    //}
-
-    //public void Initialize(UnitData data)
-    //{
-    //    m_unitData = data;
-    //    GameObject unitDisplay = Instantiate(data.unitDisplayPrefab, transform);
-    //    sprite = unitDisplay.GetComponentInChildren<SpriteRenderer>();
-    //    unitCollider = unitDisplay.GetComponent<BoxCollider2D>();
-
-    //    Vector2 adjustedColliderSize = unitCollider.size;
-
-    //    if(adjustedColliderSize.x < Constants.minUnitWidth)
-    //    {
-    //        adjustedColliderSize.x = Constants.minUnitWidth;
-    //    }
-    //    unitCollider.size = adjustedColliderSize;
-    //    m_originalColor = sprite.material.GetColor("_OutlineColor");
-    //    UseEnergy(startingEnergyCost);
-    //}
-
-    //public void OnUnitTurnStart()
-    //{
-    //    m_isDefending = false;
-    //    m_rigidBody.bodyType = RigidbodyType2D.Dynamic;
-
-    //    sprite.material.SetColor("_OutlineColor", m_originalColor);
-    //    sprite.material.SetFloat("_OutlineWidth", Constants.unitOutlineWidth);
-    //}
-
-    //public void OnUnitEndTurn()
-    //{
-    //    m_rigidBody.bodyType = RigidbodyType2D.Static;
-    //    sprite.material.SetFloat("_OutlineWidth", 0);
-    //}
-
-    //public void Defend()
-    //{
-    //    m_isDefending = true;
-    //    UseEnergy(Constants.defendEnergyCost);
-    //}
-
-    //public void ApplyDamage(int amount)
-    //{
-    //    m_unitData.stats.currentHP = Mathf.Clamp(m_unitData.stats.currentHP - amount, 0, m_unitData.totalStats.maxHP);
-
-    //    OnDamageTaken?.Invoke(this, m_unitData.stats.currentHP, m_unitData.totalStats.maxHP, amount);
-    //    if(m_unitData.stats.currentHP == 0)
-    //    {
-    //        OnUnitDies?.Invoke(this);
-    //        gameObject.SetActive(false);
-    //    }
-    //}
-
-    //public bool IsAlive()
-    //{
-    //    return m_unitData.stats.currentHP > 0;
-    //}
-
-    //public void UseMana(int amount)
-    //{
-    //    m_unitData.stats.currentMP = Mathf.Clamp(m_unitData.stats.currentMP - amount, 0, m_unitData.totalStats.maxMP);
-    //    OnDamageTaken?.Invoke(this, m_unitData.stats.currentMP, m_unitData.totalStats.maxMP, amount);
-    //}
-
-    //public bool HasEnoughMana(int amount)
-    //{
-    //    return m_unitData.stats.currentMP > amount;
-    //}   
-
-    //public void MoveUnit(Vector2 nextPos)
-    //{
-    //    m_rigidBody.MovePosition(nextPos);
-    //}
-
-    //public void RotateTowards(Vector2 direction)
-    //{
-    //    float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
-    //    Quaternion quat = Quaternion.Lerp(Quaternion.Euler(0, 0, rotation), Quaternion.Euler(0, 0, angle), Time.fixedDeltaTime * 5);
-
-    //    SetUnitRotation(quat.eulerAngles.z);
-    //}
-
-    //public void SetUnitRotation(float angle)
-    //{
-    //    rotation = angle;
-    //    if((angle > 90 && angle < 270) ||
-    //        (angle < -90 && angle > -180) ||
-    //        (angle > 90 && angle < 180))
-    //    {
-    //        sprite.flipX = true;
-    //    }
-    //    else if((angle < 90 && angle > -90) ||
-    //        angle > 270)
-    //    {
-    //        sprite.flipX = false;
-    //    }
-    //}
-
-    //public UnitData GetUnitData()
-    //{
-    //    return m_unitData;
-    //}
-
-    //public void UseEnergy(int amount)
-    //{
-    //    time = amount / m_unitData.stats.speed;
-    //}
-
     public delegate void onUnitDies(BattleUnit affectedUnit);
     public delegate void onDamageTaken(BattleUnit affectedUnit, int damageTaken);
     public delegate void onManaConsumed(BattleUnit affectedUnit, int manaUsed);
@@ -228,6 +138,12 @@ public class BattleUnit : MonoBehaviour
     Vector2 m_startingPos = Vector2.zero;
     float m_rotation = 0;
 
+    AttackDescription m_attackDescription;
+    HitboxDescription m_hitboxDescription;
+    HitboxDescription m_defaultAttackHitbox;
+
+    static readonly AttackDescription defaultAttackDescription = new AttackDescription(0, BattleConstants.attackEnergyCost, 0, TargetTag.Enemy);
+
     private void Awake()
     {
         m_rigidBody = GetComponent<Rigidbody2D>();
@@ -235,8 +151,6 @@ public class BattleUnit : MonoBehaviour
 
     private void Update()
     {
-        if(!isActiveUnit)
-            return;
     }
 
     public void Initialize(UnitData data, bool isPlayerUnit)
@@ -248,6 +162,9 @@ public class BattleUnit : MonoBehaviour
 
         unitCollider = unitDisplay.GetComponent<BoxCollider2D>();
         sprite = unitCollider.GetComponentInChildren<SpriteRenderer>();
+
+        m_defaultAttackHitbox = new HitboxDescription(HitboxStyle.Attached, data.equipment.weapon.hitbox);
+        m_attackDescription = defaultAttackDescription;
 
         UseEnergy(BattleConstants.startingEnergyCost);
     }
@@ -261,10 +178,9 @@ public class BattleUnit : MonoBehaviour
 
         sprite.material.SetColor("_OutlineColor", BattleConstants.selectedUnitOutlineColor);
         sprite.material.SetFloat("_OutlineWidth", BattleConstants.unitOutlineWidth);
+        SkillMenu.instance.SetUnit(this);
 
-        UnitHitDetector.instance.SetUnit(this);
-        m_unitData.equipment.weapon.hitbox.ConfigureDetector(UnitHitDetector.instance);
-        AttachCollider(m_unitData.equipment.weapon.hitbox.GetSize().x);
+        ConfigAttack(defaultAttackDescription, m_defaultAttackHitbox);
     }
 
     public void OnUnitEndTurn()
@@ -272,28 +188,36 @@ public class BattleUnit : MonoBehaviour
         isActiveUnit = false;
         m_rigidBody.bodyType = RigidbodyType2D.Static;
         sprite.material.SetFloat("_OutlineWidth", 0);
+
+        UnitHitDetector.instance.ClearCollisions();
     }
 
     public void Attack()
     {
         Debug.Assert(CanAttack(), "Can attack was not checked, before calling Attack");
-        List<BattleUnit> enemies = new List<BattleUnit>(UnitHitDetector.instance.enemyCollisions);
-        if(enemies.Count == 0)
+        List<BattleUnit> targets = new List<BattleUnit>(
+            (m_attackDescription.targetTag == TargetTag.Enemy) ?
+            UnitHitDetector.instance.enemyCollisions :
+            UnitHitDetector.instance.allyCollisions);
+
+        if(targets.Count == 0)
             return;
 
-        foreach(BattleUnit enemy in enemies)
+        ConsumeMana(m_attackDescription.manaCost);
+
+        foreach(BattleUnit enemy in targets)
         {
             UnitStats myData = unitData.totalStats;
             UnitStats enemyData = enemy.unitData.totalStats;
 
-            int damage = myData.attack - enemyData.defense;
+            int damage = myData.attack + m_attackDescription.attackModifier - enemyData.defense;
 
             damage = Mathf.Max(0, damage);
 
             enemy.ApplyDamage(damage);
         }
 
-        UseEnergy(BattleConstants.attackEnergyCost);
+        UseEnergy(m_attackDescription.energyCost);
         BattleState.instance.StartNextTurn();
     }
 
@@ -362,9 +286,9 @@ public class BattleUnit : MonoBehaviour
 
         UnitHitDetector.instance.transform.parent = transform;
         UnitHitDetector.instance.transform.localPosition = Vector3.zero;
+        UnitHitDetector.instance.transform.rotation = Quaternion.Euler(0, 0, m_rotation);
         //UnitHitDetector.instance.transform.localPosition = new Vector3(unitOffset + (hitboxSize - unitOffset) / 2, 0);
         UnitHitDetector.instance.AdjustOffset(new Vector2(unitOffset + (hitboxSize - unitOffset) / 2, 0));
-        UnitHitDetector.instance.transform.rotation = Quaternion.Euler(0, 0, m_rotation);
     }
 
     private void DetachCollider()
@@ -381,7 +305,7 @@ public class BattleUnit : MonoBehaviour
 
         m_rotation = quat.eulerAngles.z;
 
-        if(isActiveUnit)
+        if(isActiveUnit && m_hitboxDescription.style == HitboxStyle.Attached)
         {
             UnitHitDetector.instance.transform.rotation = quat;
         }
@@ -395,5 +319,19 @@ public class BattleUnit : MonoBehaviour
     private bool IsNextPositionInBounds(Vector2 nextPos)
     {
         return (nextPos - m_startingPos).sqrMagnitude < BattleConstants.unitMaxUnitTravelDistance * BattleConstants.unitMaxUnitTravelDistance; 
+    }
+
+    void ConfigAttack(AttackDescription attackDescription, HitboxDescription hitboxDescription)
+    {
+        m_attackDescription = attackDescription;
+        m_hitboxDescription = hitboxDescription;
+
+        UnitHitDetector.instance.SetUnit(this);
+        hitboxDescription.hitboxConfig.ConfigureDetector(UnitHitDetector.instance);
+
+        if(hitboxDescription.style == HitboxStyle.Attached)
+        {
+            AttachCollider(hitboxDescription.hitboxConfig.GetSize().x);
+        }
     }
 }
